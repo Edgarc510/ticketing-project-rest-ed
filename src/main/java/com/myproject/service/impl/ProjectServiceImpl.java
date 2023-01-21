@@ -11,7 +11,10 @@ import com.myproject.repository.ProjectRepository;
 import com.myproject.service.ProjectService;
 import com.myproject.service.TaskService;
 import com.myproject.service.UserService;
+import org.keycloak.adapters.springsecurity.account.SimpleKeycloakAccount;
 import org.springframework.context.annotation.Lazy;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.util.List;
@@ -100,7 +103,12 @@ public class ProjectServiceImpl implements ProjectService {
     @Override
     public List<ProjectDTO> listAllProjectDetails() {
 
-        UserDTO currentUserDTO = userService.findByUserName("harold@manager.com");
+
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        SimpleKeycloakAccount details = (SimpleKeycloakAccount) authentication.getDetails();
+        String username = details.getKeycloakSecurityContext().getToken().getPreferredUsername();
+
+        UserDTO currentUserDTO = userService.findByUserName(username);
 
         User user = userMapper.convertToEntity(currentUserDTO);
 

@@ -10,6 +10,9 @@ import com.myproject.mapper.TaskMapper;
 import com.myproject.repository.TaskRepository;
 import com.myproject.repository.UserRepository;
 import com.myproject.service.TaskService;
+import org.keycloak.adapters.springsecurity.account.SimpleKeycloakAccount;
+import org.springframework.security.core.Authentication;
+import org.springframework.security.core.context.SecurityContextHolder;
 import org.springframework.stereotype.Service;
 
 import java.time.LocalDate;
@@ -111,7 +114,11 @@ public class TaskServiceImpl implements TaskService {
     @Override
     public List<TaskDTO> listAllTasksByStatusIsNot(Status status) {
 
-        User loggedInUser = userRepository.findByUserName("john@employee.com");
+        Authentication authentication = SecurityContextHolder.getContext().getAuthentication();
+        SimpleKeycloakAccount details = (SimpleKeycloakAccount) authentication.getDetails();
+        String username = details.getKeycloakSecurityContext().getToken().getPreferredUsername();
+
+        User loggedInUser = userRepository.findByUserName(username);
 
         List<Task> list = taskRepository.findAllByTaskStatusIsNotAndAssignedEmployee(status, loggedInUser);
         return list.stream().map(taskMapper::convertToDTO).collect(Collectors.toList());
