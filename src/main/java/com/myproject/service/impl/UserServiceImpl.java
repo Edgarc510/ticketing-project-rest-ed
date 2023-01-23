@@ -6,6 +6,7 @@ import com.myproject.dto.UserDTO;
 import com.myproject.entity.User;
 import com.myproject.mapper.UserMapper;
 import com.myproject.repository.UserRepository;
+import com.myproject.service.KeycloakService;
 import com.myproject.service.ProjectService;
 import com.myproject.service.TaskService;
 import com.myproject.service.UserService;
@@ -22,13 +23,16 @@ public class UserServiceImpl implements UserService {
     private final UserMapper userMapper;
     private final ProjectService projectService;
     private final TaskService taskService;
+    private final KeycloakService keycloakService;
 
-    public UserServiceImpl(UserRepository userRepository, UserMapper userMapper, ProjectService projectService, TaskService taskService) {
+    public UserServiceImpl(UserRepository userRepository, UserMapper userMapper, ProjectService projectService, TaskService taskService, KeycloakService keycloakService) {
         this.userRepository = userRepository;
         this.userMapper = userMapper;
         this.projectService = projectService;
         this.taskService = taskService;
+        this.keycloakService = keycloakService;
     }
+
 
     @Override
     public List<UserDTO> listAllUsers() {
@@ -52,6 +56,8 @@ public class UserServiceImpl implements UserService {
         User obj = userMapper.convertToEntity(dto);
 
         userRepository.save(obj);
+
+        keycloakService.userCreate(dto);
 
     }
 
