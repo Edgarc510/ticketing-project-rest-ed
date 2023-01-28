@@ -4,12 +4,14 @@ import com.myproject.dto.ProjectDTO;
 import com.myproject.dto.TaskDTO;
 import com.myproject.dto.UserDTO;
 import com.myproject.entity.User;
+import com.myproject.exception.TicketingProjectException;
 import com.myproject.mapper.UserMapper;
 import com.myproject.repository.UserRepository;
 import com.myproject.service.KeycloakService;
 import com.myproject.service.ProjectService;
 import com.myproject.service.TaskService;
 import com.myproject.service.UserService;
+import lombok.SneakyThrows;
 import org.springframework.data.domain.Sort;
 import org.springframework.stereotype.Service;
 
@@ -83,18 +85,26 @@ public class UserServiceImpl implements UserService {
     }
 
     @Override
-    public void delete(String username) {
+    public void delete(String username) throws TicketingProjectException {
         User user = userRepository.findByUserName(username);
 
         if (checkIfUserCanBeDeleted(user)) {
             user.setIsDeleted(true);
             user.setUserName(user.getUserName() + "-" + user.getId());
             userRepository.save(user);
+            keycloakService.delete(username);
+        }else {
+            throw new TicketingProjectException("User cannot be deleted");
         }
 
-    }
 
+    }
+    @SneakyThrows
     private boolean checkIfUserCanBeDeleted(User user) {
+
+        if (user == null) {
+            throw new TicketingProjectException("User not found");
+        }
 
         switch (user.getRole().getDescription()) {
             case "Manager":

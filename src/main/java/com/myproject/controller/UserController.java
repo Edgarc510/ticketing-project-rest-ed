@@ -1,10 +1,13 @@
 package com.myproject.controller;
 
+import com.myproject.annotation.DefaultExceptionMessage;
 import com.myproject.dto.UserDTO;
 import com.myproject.entity.ResponseWrapper;
+import com.myproject.exception.TicketingProjectException;
 import com.myproject.service.UserService;
 import io.swagger.v3.oas.annotations.Operation;
 import io.swagger.v3.oas.annotations.tags.Tag;
+import lombok.SneakyThrows;
 import org.springframework.http.HttpStatus;
 import org.springframework.http.ResponseEntity;
 import org.springframework.web.bind.annotation.*;
@@ -58,7 +61,8 @@ return ResponseEntity.ok((new ResponseWrapper("User is successfully retrieved",u
     @DeleteMapping("/{userName}")
     @RolesAllowed("Admin")
     @Operation(summary = "Delete User")
-    public ResponseEntity<ResponseWrapper> deleteUser(@PathVariable("userName")String userName) {
+    @DefaultExceptionMessage(defaultMessage = "Failed to delete user")
+    public ResponseEntity<ResponseWrapper> deleteUser(@PathVariable("userName")String userName) throws TicketingProjectException {
         userService.delete(userName);
 //        return ResponseEntity.status(HttpStatus.NO_CONTENT).body(new ResponseWrapper("User is successfully deleted",HttpStatus.CREATED));
         return ResponseEntity.ok(new ResponseWrapper("User is successfully deleted",HttpStatus.CREATED));
