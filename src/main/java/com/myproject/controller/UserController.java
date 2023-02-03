@@ -1,6 +1,7 @@
 package com.myproject.controller;
 
 import com.myproject.annotation.DefaultExceptionMessage;
+import com.myproject.annotation.ExecutionTime;
 import com.myproject.dto.UserDTO;
 import com.myproject.entity.ResponseWrapper;
 import com.myproject.exception.TicketingProjectException;
@@ -25,7 +26,7 @@ public class UserController {
     public UserController(UserService userService) {
         this.userService = userService;
     }
-
+    @ExecutionTime
     @GetMapping
     @RolesAllowed("Admin")
     @Operation(summary = "Get Users")
@@ -33,7 +34,7 @@ public class UserController {
         List<UserDTO> userDTOList = userService.listAllUsers();
         return ResponseEntity.ok(new ResponseWrapper("Users are successfully retrieved",userDTOList, HttpStatus.OK));
     }
-
+    @ExecutionTime
     @GetMapping("/{userName}")
     @RolesAllowed("Admin")
     @Operation(summary = "Get Users by username")
